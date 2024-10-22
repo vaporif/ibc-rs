@@ -1,5 +1,3 @@
-use alloc::borrow::ToOwned;
-use alloc::string::ToString;
 use ibc_core_channel::handler::{
     acknowledgement_packet_execute, acknowledgement_packet_validate, chan_close_confirm_execute,
     chan_close_confirm_validate, chan_close_init_execute, chan_close_init_validate,
