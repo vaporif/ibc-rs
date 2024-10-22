@@ -26,9 +26,9 @@ use ibc_primitives::proto::Any;
 
 /// Entrypoint which performs both validation and message execution
 pub fn dispatch<Ctx>(
-    _ctx: &mut Ctx,
-    _router: &mut impl Router,
-    _msg: MsgEnvelope,
+    ctx: &mut Ctx,
+    router: &mut impl Router,
+    msg: MsgEnvelope,
 ) -> Result<(), ContextError>
 where
     Ctx: ExecutionContext,
@@ -36,12 +36,12 @@ where
     <<Ctx::E as ClientExecutionContext>::ClientStateMut as TryFrom<Any>>::Error: Into<ClientError>,
     <Ctx::HostClientState as TryFrom<Any>>::Error: Into<ClientError>,
 {
-    Err(ContextError::ClientError(ClientError::Other {
-        description: "WWWWWWWWWWWW".into(),
-    }))
-    //tracing::info!("handler enter {msg:?}");
-    //validate(ctx, router, msg.clone())?;
-    //execute(ctx, router, msg)
+    //Err(ContextError::ClientError(ClientError::Other {
+    //    description: "WWWWWWWWWWWW".into(),
+    //}))
+    tracing::info!("----YEYE enter {msg:?}");
+    validate(ctx, router, msg.clone())?;
+    execute(ctx, router, msg)
 }
 
 /// Entrypoint which only performs message validation
