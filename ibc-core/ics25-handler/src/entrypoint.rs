@@ -1,3 +1,5 @@
+use alloc::borrow::ToOwned;
+use alloc::string::ToString;
 use ibc_core_channel::handler::{
     acknowledgement_packet_execute, acknowledgement_packet_validate, chan_close_confirm_execute,
     chan_close_confirm_validate, chan_close_init_execute, chan_close_init_validate,
@@ -26,9 +28,9 @@ use ibc_primitives::proto::Any;
 
 /// Entrypoint which performs both validation and message execution
 pub fn dispatch<Ctx>(
-    ctx: &mut Ctx,
-    router: &mut impl Router,
-    msg: MsgEnvelope,
+    _ctx: &mut Ctx,
+    _router: &mut impl Router,
+    _msg: MsgEnvelope,
 ) -> Result<(), ContextError>
 where
     Ctx: ExecutionContext,
@@ -36,9 +38,12 @@ where
     <<Ctx::E as ClientExecutionContext>::ClientStateMut as TryFrom<Any>>::Error: Into<ClientError>,
     <Ctx::HostClientState as TryFrom<Any>>::Error: Into<ClientError>,
 {
-    tracing::info!("handler enter {msg:?}");
-    validate(ctx, router, msg.clone())?;
-    execute(ctx, router, msg)
+    Err(ContextError::ClientError(ClientError::Other {
+        description: "WWWWWWWWWWWW".into(),
+    }))
+    //tracing::info!("handler enter {msg:?}");
+    //validate(ctx, router, msg.clone())?;
+    //execute(ctx, router, msg)
 }
 
 /// Entrypoint which only performs message validation
