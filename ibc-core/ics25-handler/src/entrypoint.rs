@@ -36,6 +36,7 @@ where
     <<Ctx::E as ClientExecutionContext>::ClientStateMut as TryFrom<Any>>::Error: Into<ClientError>,
     <Ctx::HostClientState as TryFrom<Any>>::Error: Into<ClientError>,
 {
+    tracing::info!("handler enter {msg:?}");
     validate(ctx, router, msg.clone())?;
     execute(ctx, router, msg)
 }

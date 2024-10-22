@@ -27,6 +27,7 @@ ibc-core-router           = { workspace = true }
 ibc-core-handler-types    = { workspace = true }
 ibc-core-host             = { workspace = true }
 ibc-primitives            = { workspace = true }
+tracing            = { workspace = true }
 
 [features]
 default = [ "std" ]
