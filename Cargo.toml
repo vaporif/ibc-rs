@@ -54,6 +54,8 @@ authors      = [ "Informal Systems <hello@informal.systems>" ]
 
 [workspace.dependencies]
 # external dependencies
+
+ics23               = { version = "0.12", default-features = false, features = [ "host-functions" ] }
 tracing = { version = "0.1.40", default-features = false }
 base64          = { version = "0.22", default-features = false }
 borsh           = { version = "1", default-features = false, features = [ "derive" ] }
@@ -119,3 +121,6 @@ tendermint-testgen               = { version = "0.38.0", default-features = fals
 # parity dependencies
 parity-scale-codec = { version = "3.6.12", default-features = false, features = [ "derive" ] }
 scale-info         = { version = "2.11.3", default-features = false }
+
+[patch.crates-io]
+ics23  = { git = "https://github.com/vaporif/ics23.git", rev = "4d3a60cde0c2c7f3750245e9f771ad4008afd064" }

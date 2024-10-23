@@ -28,7 +28,7 @@ where
     validate_impl(ctx_b, &msg, &vars)
 }
 
-#[instrument(skip(ctx_b))]
+#[instrument(skip_all)]
 fn validate_impl<Ctx>(
     ctx_b: &Ctx,
     msg: &MsgConnectionOpenTry,
