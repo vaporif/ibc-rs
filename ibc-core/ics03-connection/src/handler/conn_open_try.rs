@@ -103,6 +103,7 @@ where
                 .map_err(ConnectionError::VerifyConnectionState)?;
         }
 
+        tracing::info!("client_state_of_a_on_b proof client");
         client_state_of_a_on_b
             .verify_membership(
                 prefix_on_a,
@@ -128,6 +129,7 @@ where
             msg.consensus_height_of_b_on_a.revision_height(),
         );
 
+        tracing::info!("client_state_of_a_on_b proof consensus");
         client_state_of_a_on_b
             .verify_membership(
                 prefix_on_a,

@@ -121,6 +121,7 @@ impl ClientStateCommon for ClientState {
         path: PathBytes,
         value: Vec<u8>,
     ) -> Result<(), ClientError> {
+        tracing::info!("verify_membership_raw");
         verify_membership::<HostFunctionsManager>(
             &self.inner().proof_specs,
             prefix,
@@ -300,6 +301,7 @@ pub fn verify_membership<H: HostFunctionsProvider>(
     path: PathBytes,
     value: Vec<u8>,
 ) -> Result<(), ClientError> {
+    tracing::info!("verify_membership");
     if prefix.is_empty() {
         return Err(ClientError::Ics23Verification(
             CommitmentError::EmptyCommitmentPrefix,
@@ -307,6 +309,8 @@ pub fn verify_membership<H: HostFunctionsProvider>(
     }
 
     let merkle_path = MerklePath::new(vec![prefix.as_bytes().to_vec().into(), path]);
+
+    tracing::info!("verify_membership path {merkle_path:?}");
     let merkle_proof = MerkleProof::try_from(proof).map_err(ClientError::InvalidCommitmentProof)?;
 
     merkle_proof
