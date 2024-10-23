@@ -19,6 +19,7 @@ use ibc_core_host::types::path::{
 use ibc_primitives::prelude::*;
 use ibc_primitives::proto::Any;
 use ibc_primitives::{Timestamp, ToVec};
+use tracing::instrument;
 
 use super::ClientState;
 use crate::consensus_state::ConsensusState as TmConsensusState;
@@ -293,6 +294,7 @@ pub fn verify_upgrade_client<H: HostFunctionsProvider>(
 /// Note that this function is typically implemented as part of the
 /// [`ClientStateCommon`] trait, but has been made a standalone function
 /// in order to make the ClientState APIs more flexible.
+#[instrument]
 pub fn verify_membership<H: HostFunctionsProvider>(
     proof_specs: &ProofSpecs,
     prefix: &CommitmentPrefix,
@@ -301,7 +303,7 @@ pub fn verify_membership<H: HostFunctionsProvider>(
     path: PathBytes,
     value: Vec<u8>,
 ) -> Result<(), ClientError> {
-    tracing::info!("verify_membership");
+    tracing::info!("inside tendermint client");
     if prefix.is_empty() {
         return Err(ClientError::Ics23Verification(
             CommitmentError::EmptyCommitmentPrefix,
@@ -310,9 +312,10 @@ pub fn verify_membership<H: HostFunctionsProvider>(
 
     let merkle_path = MerklePath::new(vec![prefix.as_bytes().to_vec().into(), path]);
 
-    tracing::info!("verify_membership path {merkle_path:?}");
+    tracing::info!("merkle_path {merkle_path:?}");
     let merkle_proof = MerkleProof::try_from(proof).map_err(ClientError::InvalidCommitmentProof)?;
 
+    tracing::info!("merkle_proof {merkle_proof:?}");
     merkle_proof
         .verify_membership::<H>(proof_specs, root.clone().into(), merkle_path, value, 0)
         .map_err(ClientError::Ics23Verification)
