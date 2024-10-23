@@ -294,7 +294,7 @@ pub fn verify_upgrade_client<H: HostFunctionsProvider>(
 /// Note that this function is typically implemented as part of the
 /// [`ClientStateCommon`] trait, but has been made a standalone function
 /// in order to make the ClientState APIs more flexible.
-#[instrument]
+#[instrument(skip_all)]
 pub fn verify_membership<H: HostFunctionsProvider>(
     proof_specs: &ProofSpecs,
     prefix: &CommitmentPrefix,
