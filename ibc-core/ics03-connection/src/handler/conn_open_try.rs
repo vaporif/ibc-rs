@@ -15,6 +15,7 @@ use ibc_core_host::{ExecutionContext, ValidationContext};
 use ibc_primitives::prelude::*;
 use ibc_primitives::proto::{Any, Protobuf};
 use ibc_primitives::ToVec;
+use tracing::{info, instrument};
 
 use crate::handler::{pack_host_consensus_state, unpack_host_client_state};
 
@@ -27,6 +28,7 @@ where
     validate_impl(ctx_b, &msg, &vars)
 }
 
+#[instrument(skip(ctx_b))]
 fn validate_impl<Ctx>(
     ctx_b: &Ctx,
     msg: &MsgConnectionOpenTry,
@@ -83,6 +85,13 @@ where
         let prefix_on_a = vars.conn_end_on_b.counterparty().prefix();
         let prefix_on_b = ctx_b.commitment_prefix();
 
+        let prefix_string_a =
+            String::from_utf8(prefix_on_a.as_bytes().to_vec()).expect("prefix a parse");
+
+        let prefix_string_b =
+            String::from_utf8(prefix_on_b.as_bytes().to_vec()).expect("prefix b parse");
+
+        info!("prefixes, a: `{prefix_string_a}`, b: `{prefix_string_b}`");
         {
             let expected_conn_end_on_a = ConnectionEnd::new(
                 State::Init,
@@ -103,7 +112,7 @@ where
                 .map_err(ConnectionError::VerifyConnectionState)?;
         }
 
-        tracing::info!("client_state_of_a_on_b proof client");
+        tracing::info!("verify_membership proof_client_state_of_b_on_a");
         client_state_of_a_on_b
             .verify_membership(
                 prefix_on_a,
@@ -117,6 +126,7 @@ where
                 client_error: e,
             })?;
 
+        tracing::info!("verify_membership proof_client_state_of_b_on_a is ok");
         let expected_consensus_state_of_b_on_a =
             ctx_b.host_consensus_state(&msg.consensus_height_of_b_on_a)?;
 
@@ -129,7 +139,7 @@ where
             msg.consensus_height_of_b_on_a.revision_height(),
         );
 
-        tracing::info!("client_state_of_a_on_b proof consensus");
+        tracing::info!("verify_membership proof_client_state_of_b_on_a");
         client_state_of_a_on_b
             .verify_membership(
                 prefix_on_a,
@@ -142,6 +152,8 @@ where
                 height: msg.proofs_height_on_a,
                 client_error: e,
             })?;
+
+        tracing::info!("verify_membership proof_client_state_of_b_on_a is ok");
     }
 
     Ok(())
@@ -188,6 +200,7 @@ where
     Ok(())
 }
 
+#[derive(Debug)]
 struct LocalVars {
     conn_id_on_b: ConnectionId,
     conn_end_on_b: ConnectionEnd,
