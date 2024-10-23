@@ -123,4 +123,4 @@ parity-scale-codec = { version = "3.6.12", default-features = false, features = 
 scale-info         = { version = "2.11.3", default-features = false }
 
 [patch.crates-io]
-ics23  = { git = "https://github.com/vaporif/ics23.git", rev = "1fe1f99b61462ee022dc389275020fd6072b7d25" }
+ics23  = { git = "https://github.com/vaporif/ics23.git", rev = "1f6c82c5ddc2dec59210731ef79a094283bb1927" }
