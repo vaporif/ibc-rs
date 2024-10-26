@@ -135,7 +135,7 @@ impl MerkleProof {
                         .map_err(|_| CommitmentError::InvalidMerkleProof)?;
 
                     if !verify_membership::<H>(proof, spec, &subroot, key.as_ref(), &value) {
-                        tracing::error!("membership error");
+                        tracing::error!("merkle verify_membership has failed");
                         return Err(CommitmentError::VerificationFailure);
                     }
                     value.clone_from(&subroot);
