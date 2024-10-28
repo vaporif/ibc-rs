@@ -24,6 +24,7 @@ where
     Ctx: ValidationContext,
     <Ctx::HostClientState as TryFrom<Any>>::Error: Into<ClientError>,
 {
+    tracing::info!("in try validate")
     let vars = LocalVars::new(ctx_b, &msg)?;
     validate_impl(ctx_b, &msg, &vars)
 }
@@ -55,7 +56,9 @@ where
         description: "failed to get host height".to_string(),
     })?;
 
-    tracing::info!("Consensus heights: {consensus_height:?}, host height: {host_height:?}",);
+    tracing::info!(
+        "Consensus heights: height of b on a {consensus_height:?}, host height: {host_height:?}",
+    );
 
     if msg.consensus_height_of_b_on_a > host_height {
         // Fail if the consensus height is too advanced.
