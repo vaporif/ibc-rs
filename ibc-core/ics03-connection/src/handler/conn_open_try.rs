@@ -24,7 +24,7 @@ where
     Ctx: ValidationContext,
     <Ctx::HostClientState as TryFrom<Any>>::Error: Into<ClientError>,
 {
-    tracing::info!("in try validate")
+    tracing::info!("in try validate");
     let vars = LocalVars::new(ctx_b, &msg)?;
     validate_impl(ctx_b, &msg, &vars)
 }
