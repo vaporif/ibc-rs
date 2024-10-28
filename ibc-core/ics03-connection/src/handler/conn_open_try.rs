@@ -38,6 +38,8 @@ where
     Ctx: ValidationContext,
     <Ctx::HostClientState as TryFrom<Any>>::Error: Into<ClientError>,
 {
+    let consensus_height = msg.consensus_height_of_b_on_a;
+    // Add debug logging
     ctx_b.validate_message_signer(&msg.signer)?;
 
     let client_val_ctx_b = ctx_b.get_client_validation_context();
@@ -52,6 +54,9 @@ where
     let host_height = ctx_b.host_height().map_err(|_| ConnectionError::Other {
         description: "failed to get host height".to_string(),
     })?;
+
+    tracing::info!("Consensus heights: {consensus_height:?}, host height: {host_height:?}",);
+
     if msg.consensus_height_of_b_on_a > host_height {
         // Fail if the consensus height is too advanced.
         return Err(ConnectionError::InvalidConsensusHeight {
@@ -132,7 +137,11 @@ where
 
         let stored_consensus_state_of_b_on_a =
             pack_host_consensus_state(expected_consensus_state_of_b_on_a, &vars.client_id_on_a);
-
+        tracing::info!(
+            "Consensus state verification: {}, state: {:?}",
+            msg.consensus_height_of_b_on_a,
+            stored_consensus_state_of_b_on_a,
+        );
         let client_cons_state_path_on_a = ClientConsensusStatePath::new(
             client_id_on_a.clone(),
             msg.consensus_height_of_b_on_a.revision_number(),
