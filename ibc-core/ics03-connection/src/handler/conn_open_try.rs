@@ -24,12 +24,19 @@ where
     Ctx: ValidationContext,
     <Ctx::HostClientState as TryFrom<Any>>::Error: Into<ClientError>,
 {
-    tracing::info!("in try validate");
     let vars = LocalVars::new(ctx_b, &msg)?;
     validate_impl(ctx_b, &msg, &vars)
 }
 
-#[instrument(skip_all)]
+#[instrument(
+    level = "info",
+    fields(
+        client_id_on_b= msg.client_id_on_b.as_str(),
+        consensus_height_of_b_on_a = ?msg.consensus_height_of_b_on_a,
+        host_height = ?ctx_b.host_height().expect("succeed") 
+    ),
+    skip(ctx_b, vars) // Skip complex types that might not implement Debug
+)]
 fn validate_impl<Ctx>(
     ctx_b: &Ctx,
     msg: &MsgConnectionOpenTry,
@@ -39,7 +46,6 @@ where
     Ctx: ValidationContext,
     <Ctx::HostClientState as TryFrom<Any>>::Error: Into<ClientError>,
 {
-    let consensus_height = msg.consensus_height_of_b_on_a;
     // Add debug logging
     ctx_b.validate_message_signer(&msg.signer)?;
 
@@ -55,10 +61,6 @@ where
     let host_height = ctx_b.host_height().map_err(|_| ConnectionError::Other {
         description: "failed to get host height".to_string(),
     })?;
-
-    tracing::info!(
-        "Consensus heights: height of b on a {consensus_height:?}, host height: {host_height:?}",
-    );
 
     if msg.consensus_height_of_b_on_a > host_height {
         // Fail if the consensus height is too advanced.
@@ -142,8 +144,6 @@ where
             pack_host_consensus_state(expected_consensus_state_of_b_on_a, &vars.client_id_on_a);
         tracing::info!(
             target: "Consensus state verification",
-            height = %msg.consensus_height_of_b_on_a,
-            host_height = %host_height,
             client_id = %vars.client_id_on_a,
             state_bytes = %hex::encode(&stored_consensus_state_of_b_on_a.value),
         );
