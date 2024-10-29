@@ -141,9 +141,11 @@ where
         let stored_consensus_state_of_b_on_a =
             pack_host_consensus_state(expected_consensus_state_of_b_on_a, &vars.client_id_on_a);
         tracing::info!(
-            "Consensus state verification: {}, state: {:?}",
-            msg.consensus_height_of_b_on_a,
-            stored_consensus_state_of_b_on_a,
+            target: "Consensus state verification",
+            height = %msg.consensus_height_of_b_on_a,
+            host_height = %host_height,
+            client_id = %vars.client_id_on_a,
+            state_bytes = %hex::encode(&stored_consensus_state_of_b_on_a.value),
         );
         let client_cons_state_path_on_a = ClientConsensusStatePath::new(
             client_id_on_a.clone(),

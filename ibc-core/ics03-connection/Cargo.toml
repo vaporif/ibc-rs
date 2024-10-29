@@ -25,6 +25,7 @@ ibc-core-handler-types    = { workspace = true }
 ibc-primitives            = { workspace = true }
 ibc-client-wasm-types     = { workspace = true, optional = true }
 tracing     = { workspace = true }
+hex     = { workspace = true }
 
 prost = { workspace = true, optional = true }
 
