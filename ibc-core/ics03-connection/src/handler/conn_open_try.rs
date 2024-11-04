@@ -189,6 +189,7 @@ fn execute_impl<Ctx>(
 where
     Ctx: ExecutionContext,
 {
+    tracing::info!("execute try conn");
     let conn_id_on_a = vars
         .conn_end_on_b
         .counterparty()
@@ -209,6 +210,8 @@ where
         &ClientConnectionPath::new(msg.client_id_on_b),
         vars.conn_id_on_b.clone(),
     )?;
+
+    tracing::info!("store conn");
     ctx_b.store_connection(&ConnectionPath::new(&vars.conn_id_on_b), vars.conn_end_on_b)?;
 
     Ok(())

@@ -36,9 +36,12 @@ where
     <<Ctx::E as ClientExecutionContext>::ClientStateMut as TryFrom<Any>>::Error: Into<ClientError>,
     <Ctx::HostClientState as TryFrom<Any>>::Error: Into<ClientError>,
 {
-    tracing::info!("--------------------------------");
+    tracing::warn!("pre validate");
     validate(ctx, router, msg.clone())?;
-    execute(ctx, router, msg)
+    tracing::warn!("post validate");
+    let res = execute(ctx, router, msg);
+    tracing::warn!("post post execute");
+    res
 }
 
 /// Entrypoint which only performs message validation
