@@ -215,13 +215,24 @@ where
 
     ctx_b.increase_connection_counter()?;
     ctx_b.store_connection_to_client(
-        &ClientConnectionPath::new(msg.client_id_on_b),
+        &ClientConnectionPath::new(msg.client_id_on_b.clone()),
         vars.conn_id_on_b.clone(),
     )?;
 
-    tracing::info!("connection stored");
-    ctx_b.store_connection(&ConnectionPath::new(&vars.conn_id_on_b), vars.conn_end_on_b)?;
+    tracing::info!(
+        path = ?ClientConnectionPath::new(msg.client_id_on_b.clone()),
+        var = ?vars.conn_id_on_b.clone(),
+        "connection stored to client");
 
+    ctx_b.store_connection(
+        &ConnectionPath::new(&vars.conn_id_on_b),
+        vars.conn_end_on_b.clone(),
+    )?;
+
+    tracing::info!(
+        path = ?ClientConnectionPath::new(msg.client_id_on_b.clone()),
+        var = ?vars.conn_end_on_b.clone(),
+        "connection stored ");
     Ok(())
 }
 

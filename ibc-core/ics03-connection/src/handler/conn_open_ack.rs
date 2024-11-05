@@ -14,6 +14,7 @@ use ibc_core_host::{ExecutionContext, ValidationContext};
 use ibc_primitives::prelude::*;
 use ibc_primitives::proto::{Any, Protobuf};
 use ibc_primitives::ToVec;
+use tracing::instrument;
 
 use crate::handler::{pack_host_consensus_state, unpack_host_client_state};
 
@@ -26,6 +27,17 @@ where
     validate_impl(ctx_a, &msg, &vars)
 }
 
+#[instrument(
+    level = "info",
+    fields(
+        conn_id_on_a= msg.conn_id_on_a.as_str(),
+        conn_id_on_b= msg.conn_id_on_b.as_str(),
+        proofs_height_on_b = ?msg.proofs_height_on_b,
+        consensus_height_of_a_on_b = ?msg.consensus_height_of_a_on_b,
+        ctx_a_height = ?ctx_a.host_height().expect("succeed") 
+    ),
+    skip(ctx_a, vars) // Skip complex types that might not implement Debug
+)]
 fn validate_impl<Ctx>(
     ctx_a: &Ctx,
     msg: &MsgConnectionOpenAck,
@@ -157,6 +169,17 @@ where
     execute_impl(ctx_a, msg, vars)
 }
 
+#[instrument(
+    level = "info",
+    fields(
+        conn_id_on_a= msg.conn_id_on_a.as_str(),
+        conn_id_on_b= msg.conn_id_on_b.as_str(),
+        proofs_height_on_b = ?msg.proofs_height_on_b,
+        consensus_height_of_a_on_b = ?msg.consensus_height_of_a_on_b,
+        ctx_a_height = ?ctx_a.host_height().expect("succeed") 
+    ),
+    skip(ctx_a, vars) // Skip complex types that might not implement Debug
+)]
 fn execute_impl<Ctx>(
     ctx_a: &mut Ctx,
     msg: MsgConnectionOpenAck,

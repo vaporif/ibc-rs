@@ -9,7 +9,16 @@ use ibc_core_host::types::identifiers::ConnectionId;
 use ibc_core_host::types::path::{ClientConnectionPath, ConnectionPath};
 use ibc_core_host::{ExecutionContext, ValidationContext};
 use ibc_primitives::prelude::*;
+use tracing::instrument;
 
+#[instrument(
+    level = "info",
+    fields(
+        client_id_on_b= msg.client_id_on_a.as_str(),
+        host_height = ?ctx_a.host_height().expect("succeed") 
+    ),
+    skip(ctx_a) // Skip complex types that might not implement Debug
+)]
 pub fn validate<Ctx>(ctx_a: &Ctx, msg: MsgConnectionOpenInit) -> Result<(), ContextError>
 where
     Ctx: ValidationContext,
@@ -32,6 +41,14 @@ where
     Ok(())
 }
 
+#[instrument(
+    level = "info",
+    fields(
+        client_id_on_b= msg.client_id_on_a.as_str(),
+        host_height = ?ctx_a.host_height().expect("succeed") 
+    ),
+    skip(ctx_a) // Skip complex types that might not implement Debug
+)]
 pub fn execute<Ctx>(ctx_a: &mut Ctx, msg: MsgConnectionOpenInit) -> Result<(), ContextError>
 where
     Ctx: ExecutionContext,
