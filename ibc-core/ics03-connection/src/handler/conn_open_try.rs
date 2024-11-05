@@ -181,6 +181,15 @@ where
     execute_impl(ctx_b, msg, vars)
 }
 
+#[instrument(
+    level = "info",
+    fields(
+        client_id_on_b= msg.client_id_on_b.as_str(),
+        consensus_height_of_b_on_a = ?msg.consensus_height_of_b_on_a,
+        host_height = ?ctx_b.host_height().expect("succeed") 
+    ),
+    skip(ctx_b, vars) // Skip complex types that might not implement Debug
+)]
 fn execute_impl<Ctx>(
     ctx_b: &mut Ctx,
     msg: MsgConnectionOpenTry,
@@ -189,7 +198,6 @@ fn execute_impl<Ctx>(
 where
     Ctx: ExecutionContext,
 {
-    tracing::info!("execute try conn");
     let conn_id_on_a = vars
         .conn_end_on_b
         .counterparty()
@@ -211,7 +219,7 @@ where
         vars.conn_id_on_b.clone(),
     )?;
 
-    tracing::info!("store conn");
+    tracing::info!("connection stored");
     ctx_b.store_connection(&ConnectionPath::new(&vars.conn_id_on_b), vars.conn_end_on_b)?;
 
     Ok(())
