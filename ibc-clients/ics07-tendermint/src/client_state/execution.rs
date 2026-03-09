@@ -12,6 +12,7 @@ use ibc_primitives::{IntoHostTime, TimestampError};
 
 use super::ClientState;
 
+#[cfg(feature = "rust-crypto")]
 impl<E> ClientStateExecution<E> for ClientState
 where
     E: ExtClientExecutionContext,

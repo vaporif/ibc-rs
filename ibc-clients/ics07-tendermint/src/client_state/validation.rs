@@ -2,6 +2,7 @@ use ibc_client_tendermint_types::{
     ClientState as ClientStateType, ConsensusState as ConsensusStateType, Header as TmHeader,
     Misbehaviour as TmMisbehaviour, TENDERMINT_HEADER_TYPE_URL, TENDERMINT_MISBEHAVIOUR_TYPE_URL,
 };
+#[cfg(feature = "rust-crypto")]
 use ibc_core_client::context::client_state::ClientStateValidation;
 use ibc_core_client::context::{Convertible, ExtClientValidationContext};
 use ibc_core_client::types::error::ClientError;
@@ -10,17 +11,18 @@ use ibc_core_host::types::identifiers::ClientId;
 use ibc_core_host::types::path::ClientConsensusStatePath;
 use ibc_primitives::prelude::*;
 use ibc_primitives::proto::Any;
-use tendermint::crypto::default::Sha256;
 use tendermint::crypto::Sha256 as Sha256Trait;
 use tendermint::merkle::MerkleHash;
-use tendermint_light_client_verifier::{ProdVerifier, Verifier};
+use tendermint_light_client_verifier::Verifier;
 
+#[cfg(feature = "rust-crypto")]
+use super::ClientState;
 use super::{
-    check_for_misbehaviour_on_misbehavior, check_for_misbehaviour_on_update,
-    consensus_state_status, ClientState,
+    check_for_misbehaviour_on_misbehavior, check_for_misbehaviour_on_update, consensus_state_status,
 };
 use crate::client_state::{verify_header, verify_misbehaviour};
 
+#[cfg(feature = "rust-crypto")]
 impl<V> ClientStateValidation<V> for ClientState
 where
     V: ExtClientValidationContext,
@@ -30,12 +32,13 @@ where
     /// The default verification logic exposed by ibc-rs simply delegates to a
     /// standalone `verify_client_message` function. This is to make it as
     /// simple as possible for those who merely need the default
-    /// [`ProdVerifier`] behaviour, as well as those who require custom
-    /// verification logic.
+    /// [`ProdVerifier`](tendermint_light_client_verifier::ProdVerifier)
+    /// behaviour, as well as those who require custom verification logic.
     ///
-    /// In a situation where the Tendermint [`ProdVerifier`] doesn't provide the
-    /// desired outcome, users should define a custom verifier struct and then
-    /// implement the [`Verifier`] trait for it.
+    /// In a situation where the Tendermint
+    /// [`ProdVerifier`](tendermint_light_client_verifier::ProdVerifier)
+    /// doesn't provide the desired outcome, users should define a custom
+    /// verifier struct and then implement the [`Verifier`] trait for it.
     ///
     /// In order to wire up the custom verifier, create a newtype `ClientState`
     /// wrapper similar to [`ClientState`] and implement all client state traits
@@ -52,6 +55,9 @@ where
         client_id: &ClientId,
         client_message: Any,
     ) -> Result<(), ClientError> {
+        use tendermint::crypto::default::Sha256;
+        use tendermint_light_client_verifier::ProdVerifier;
+
         verify_client_message::<V, Sha256>(
             self.inner(),
             ctx,
