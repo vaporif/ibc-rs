@@ -2,7 +2,6 @@ use ibc_client_tendermint_types::{
     ClientState as ClientStateType, ConsensusState as ConsensusStateType, Header as TmHeader,
     Misbehaviour as TmMisbehaviour, TENDERMINT_HEADER_TYPE_URL, TENDERMINT_MISBEHAVIOUR_TYPE_URL,
 };
-#[cfg(feature = "rust-crypto")]
 use ibc_core_client::context::client_state::ClientStateValidation;
 use ibc_core_client::context::{Convertible, ExtClientValidationContext};
 use ibc_core_client::types::error::ClientError;
@@ -15,14 +14,12 @@ use tendermint::crypto::Sha256 as Sha256Trait;
 use tendermint::merkle::MerkleHash;
 use tendermint_light_client_verifier::Verifier;
 
-#[cfg(feature = "rust-crypto")]
-use super::ClientState;
 use super::{
-    check_for_misbehaviour_on_misbehavior, check_for_misbehaviour_on_update, consensus_state_status,
+    check_for_misbehaviour_on_misbehavior, check_for_misbehaviour_on_update,
+    consensus_state_status, ClientState,
 };
 use crate::client_state::{verify_header, verify_misbehaviour};
 
-#[cfg(feature = "rust-crypto")]
 impl<V> ClientStateValidation<V> for ClientState
 where
     V: ExtClientValidationContext,
@@ -51,20 +48,30 @@ where
     /// parameter.
     fn verify_client_message(
         &self,
-        ctx: &V,
-        client_id: &ClientId,
-        client_message: Any,
+        _ctx: &V,
+        _client_id: &ClientId,
+        _client_message: Any,
     ) -> Result<(), ClientError> {
-        use tendermint::crypto::default::Sha256;
-        use tendermint_light_client_verifier::ProdVerifier;
+        #[cfg(feature = "rust-crypto")]
+        {
+            use tendermint::crypto::default::Sha256;
+            use tendermint_light_client_verifier::ProdVerifier;
 
-        verify_client_message::<V, Sha256>(
-            self.inner(),
-            ctx,
-            client_id,
-            client_message,
-            &ProdVerifier::default(),
-        )
+            verify_client_message::<V, Sha256>(
+                self.inner(),
+                _ctx,
+                _client_id,
+                _client_message,
+                &ProdVerifier::default(),
+            )
+        }
+        #[cfg(not(feature = "rust-crypto"))]
+        {
+            unimplemented!(
+                "verify_client_message requires the `rust-crypto` feature; \
+                 use a custom verifier via the standalone verify_client_message function instead"
+            )
+        }
     }
 
     fn check_for_misbehaviour(
